@@ -6,11 +6,11 @@ import re
 import json
 import os
 
-st.set_page_config(page_title="レシピ栄養計算アプリ")
+st.set_page_config(page_title="レシピ栄養計算", layout="wide")
 
-# ==========================
-# データ読み込み
-# ==========================
+# =========================
+# 栄養データ読み込み
+# =========================
 @st.cache_data
 def load_nutrition():
     df = pd.read_excel("nutrition.xlsx")
@@ -18,207 +18,171 @@ def load_nutrition():
 
 nutrition_dict = load_nutrition()
 
-# ==========================
-# 保存対応辞書
-# ==========================
-mapping_file = "food_mapping.json"
+# =========================
+# マッピング保存読み込み
+# =========================
+MAPPING_FILE = "food_mapping.json"
 
 def load_mapping():
-    if os.path.exists(mapping_file):
-        with open(mapping_file, "r", encoding="utf-8") as f:
+    if os.path.exists(MAPPING_FILE):
+        with open(MAPPING_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
     return {}
 
 def save_mapping(mapping):
-    with open(mapping_file, "w", encoding="utf-8") as f:
+    with open(MAPPING_FILE, "w", encoding="utf-8") as f:
         json.dump(mapping, f, ensure_ascii=False, indent=2)
 
-food_mapping = load_mapping()
+mapping = load_mapping()
 
-# ==========================
-# 正規化
-# ==========================
+# =========================
+# 文字正規化
+# =========================
 def normalize(text):
-    return text.replace("\u3000", " ").replace(" ", "").strip()
+    return str(text).replace("\u3000","").replace(" ","").strip()
 
-def search_candidates(word):
-    word = normalize(word)
+# =========================
+# 候補検索
+# =========================
+def get_candidates(word):
+    word_n = normalize(word)
+
+    # 保存済み対応を最優先
+    if word in mapping:
+        return [mapping[word]]
+
     return [
         food for food in nutrition_dict
-        if word in normalize(food)
+        if word_n in normalize(food)
     ]
 
-# ==========================
-# レシピ取得
-# ==========================
+# =========================
+# URL抽出 & レシピ取得
+# =========================
+def extract_url(text):
+    match = re.search(r'https?://[^\s]+', text)
+    return match.group(0) if match else None
+
 def get_recipe_data(url):
-    headers = {"User-Agent": "Mozilla/5.0"}
-    res = requests.get(url, headers=headers)
-    soup = BeautifulSoup(res.text, "html.parser")
+    headers={"User-Agent":"Mozilla/5.0"}
+    res=requests.get(url,headers=headers)
+    soup=BeautifulSoup(res.text,"html.parser")
 
-    title = soup.title.get_text().split("|")[0].strip()
+    title=soup.title.get_text().split("|")[0].strip()
 
-    ingredients = []
+    ingredients=[]
     for item in soup.select(".ingredient"):
-        name = item.select_one(".ingredient-name").get_text(strip=True)
-        amount = item.select_one(".ingredient-serving").get_text(strip=True)
-        ingredients.append({"name": name, "amount": amount})
+        name=item.select_one(".ingredient-name").get_text(strip=True)
+        amount=item.select_one(".ingredient-serving").get_text(strip=True)
+        ingredients.append({"name":name,"amount":amount})
 
     return title, ingredients
 
-def get_candidates(name):
-    candidates = []
+# =========================
+# 分量解析
+# =========================
+def parse_amount(text):
+    if text is None:
+        return 0
 
-    if name in food_mapping:
-        candidates.append(food_mapping[name])
+    text = str(text)
 
-    auto = search_candidates(name)
-    for a in auto:
-        if a not in candidates:
-            candidates.append(a)
+    if "g" in text:
+        return float(re.findall(r"\d+", text)[0])
 
-    return candidates
+    if "本" in text or "個" in text:
+        return float(re.findall(r"\d+", text)[0]) * 100
 
-# ==========================
-# 分量パース
-# ==========================
-def parse_amount(amount):
-    m = re.match(r'([\d/.]+)(.*)', amount)
-    if not m:
-        return 0, ""
-    num = m.group(1)
-    unit = m.group(2)
-    try:
-        value = eval(num)
-    except:
-        value = 0
-    return value, unit
+    if "丁" in text:
+        return float(re.findall(r"\d+", text)[0]) * 300
 
-import streamlit as st
-import json
+    if "大さじ" in text:
+        return float(re.findall(r"\d+", text)[0]) * 15
 
-# =====================
-# マッピング保存読み込み
-# =====================
-def load_mapping():
-    try:
-        with open("food_mapping.json", "r", encoding="utf-8") as f:
-            return json.load(f)
-    except:
-        return {}
+    if "小さじ" in text:
+        return float(re.findall(r"\d+", text)[0]) * 5
 
-def save_mapping(mapping):
-    with open("food_mapping.json", "w", encoding="utf-8") as f:
-        json.dump(mapping, f, ensure_ascii=False, indent=2)
+    return 100
 
-food_mapping = load_mapping()
-
-# ==========================
+# =========================
 # UI
-# ==========================
-st.title("🍳 レシピ栄養計算アプリ")
+# =========================
+st.title("🍳 レシピ栄養計算")
 
-url = st.text_input("レシピURLを入力")
+url_text = st.text_input("レシピURLを貼る")
 
-if url:
-    title, ingredients = get_recipe_data(url)
-    st.subheader(title)
+if url_text:
+    url = extract_url(url_text)
 
-    scale = st.slider("倍率", 0.5, 3.0, 1.0, 0.5)
+    if url:
+        title, ingredients = get_recipe_data(url)
+        st.subheader(title)
 
-    total_cal = 0
+        multiplier = st.number_input("🔢 分量倍率", value=1.0, step=0.5)
 
-    st.header("食材対応づけ")
+        total_cal = 0
 
-    for ing in ingredients:
+        for ing in ingredients:
+            st.divider()
+            st.write(f"### {ing['name']}")
 
-        name = ing["name"]
-        st.subheader(f"■ {name}")
+            candidates = get_candidates(ing["name"])
 
-        if name in food_mapping:
-            candidates = [food_mapping[name]]
-        else:
-            candidates = get_candidates(name)
+            # ===== 候補がある場合 =====
+            if candidates:
+                selected = st.selectbox(
+                    "候補",
+                    candidates,
+                    key=ing["name"]
+                )
+            else:
+                st.warning("候補が見つかりません")
 
-        if not candidates:
-            candidates = ["候補なし"]
-
-        selected = st.selectbox(
-            "候補",
-            candidates,
-            key=name
-        )
-
-        search_word = st.text_input(
-            "候補がない場合ここで検索",
-            key=f"search_{name}"
-        )
-
-        if st.button("検索", key=f"btn_{name}"):
-
-            results = search_candidates(search_word, nutrition_dict)
-
-            if results:
-                new_choice = st.selectbox(
-                    "検索結果",
-                    results,
-                    key=f"result_{name}"
+                search_word = st.text_input(
+                    "🔎 食材名を入力して検索",
+                    key=ing["name"]+"_search"
                 )
 
-                if st.button("この対応を保存", key=f"save_{name}"):
-                    food_mapping[name] = new_choice
-                    save_mapping(food_mapping)
-                    st.success("保存しました！")
-                    st.experimental_rerun()
+                selected = None
 
-    for ing in ingredients:
+                if search_word:
+                    results = [
+                        food for food in nutrition_dict
+                        if normalize(search_word) in normalize(food)
+                    ]
 
-        st.markdown("---")
-        st.write("###", ing["name"])
+                    if results:
+                        selected = st.selectbox(
+                            "検索結果",
+                            results,
+                            key=ing["name"]+"_manual"
+                        )
 
-        # 候補取得
-        candidates = []
+                        # 保存ボタン
+                        if st.button("この対応を保存", key=ing["name"]+"_save"):
+                            mapping[ing["name"]] = selected
+                            save_mapping(mapping)
+                            st.success("保存しました！次回から自動表示されます")
 
-        if ing["name"] in food_mapping:
-            candidates.append(food_mapping[ing["name"]])
+                    else:
+                        st.error("見つかりません")
 
-        auto = search_candidates(ing["name"])
-        for a in auto:
-            if a not in candidates:
-                candidates.append(a)
+            if selected:
+                default_g = parse_amount(ing["amount"])
 
-        if not candidates:
-            st.warning("候補なし")
-            continue
+                amount = st.number_input(
+                    "グラム",
+                    value=float(default_g),
+                    key=ing["name"]+"_amt"
+                )
 
-        selected = st.selectbox(
-            "食品選択",
-            candidates,
-            key=ing["name"]
-        )
+                amount *= multiplier
 
-        # 分量
-        val, unit = parse_amount(ing["amount"])
-        amount = st.number_input(
-            f"分量 ({unit})",
-            value=float(val),
-            step=1.0,
-            key=ing["name"]+"_amount"
-        )
+                kcal_per100 = float(nutrition_dict[selected]["エネルギー"])
+                kcal = kcal_per100 * amount / 100
 
-        amount *= scale
+                st.write(f"👉 {kcal:.1f} kcal")
+                total_cal += kcal
 
-        # カロリー計算（100g基準想定）
-        try:
-            cal_per_100 = float(nutrition_dict[selected]["エネルギー"])
-            cal = cal_per_100 * amount / 100
-            total_cal += cal
-            st.write(f"🔥 {round(cal,1)} kcal")
-        except:
-            st.write("カロリー計算不可")
-
-    st.markdown("## 🧮 合計カロリー")
-    st.success(f"{round(total_cal,1)} kcal")
-
-
-
+        st.divider()
+        st.subheader(f"合計カロリー: {total_cal:.1f} kcal")
