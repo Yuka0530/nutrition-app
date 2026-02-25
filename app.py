@@ -81,6 +81,25 @@ def parse_amount(amount):
         value = 0
     return value, unit
 
+import streamlit as st
+import json
+
+# =====================
+# マッピング保存読み込み
+# =====================
+def load_mapping():
+    try:
+        with open("food_mapping.json", "r", encoding="utf-8") as f:
+            return json.load(f)
+    except:
+        return {}
+
+def save_mapping(mapping):
+    with open("food_mapping.json", "w", encoding="utf-8") as f:
+        json.dump(mapping, f, ensure_ascii=False, indent=2)
+
+food_mapping = load_mapping()
+
 # ==========================
 # UI
 # ==========================
@@ -95,6 +114,49 @@ if url:
     scale = st.slider("倍率", 0.5, 3.0, 1.0, 0.5)
 
     total_cal = 0
+
+        st.header("食材対応づけ")
+
+    for ing in ingredients:
+
+        name = ing["name"]
+        st.subheader(f"■ {name}")
+
+        if name in food_mapping:
+            candidates = [food_mapping[name]]
+        else:
+            candidates = get_candidates(name)
+
+        if not candidates:
+            candidates = ["候補なし"]
+
+        selected = st.selectbox(
+            "候補",
+            candidates,
+            key=name
+        )
+
+        search_word = st.text_input(
+            "候補がない場合ここで検索",
+            key=f"search_{name}"
+        )
+
+        if st.button("検索", key=f"btn_{name}"):
+
+            results = search_candidates(search_word, nutrition_dict)
+
+            if results:
+                new_choice = st.selectbox(
+                    "検索結果",
+                    results,
+                    key=f"result_{name}"
+                )
+
+                if st.button("この対応を保存", key=f"save_{name}"):
+                    food_mapping[name] = new_choice
+                    save_mapping(food_mapping)
+                    st.success("保存しました！")
+                    st.experimental_rerun()
 
     for ing in ingredients:
 
@@ -144,3 +206,4 @@ if url:
 
     st.markdown("## 🧮 合計カロリー")
     st.success(f"{round(total_cal,1)} kcal")
+
