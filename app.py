@@ -66,6 +66,19 @@ def get_recipe_data(url):
 
     return title, ingredients
 
+def get_candidates(name):
+    candidates = []
+
+    if name in food_mapping:
+        candidates.append(food_mapping[name])
+
+    auto = search_candidates(name)
+    for a in auto:
+        if a not in candidates:
+            candidates.append(a)
+
+    return candidates
+
 # ==========================
 # 分量パース
 # ==========================
@@ -206,5 +219,6 @@ if url:
 
     st.markdown("## 🧮 合計カロリー")
     st.success(f"{round(total_cal,1)} kcal")
+
 
 
