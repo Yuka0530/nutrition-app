@@ -115,7 +115,7 @@ if url:
 
     total_cal = 0
 
-        st.header("食材対応づけ")
+    st.header("食材対応づけ")
 
     for ing in ingredients:
 
@@ -206,4 +206,5 @@ if url:
 
     st.markdown("## 🧮 合計カロリー")
     st.success(f"{round(total_cal,1)} kcal")
+
 
