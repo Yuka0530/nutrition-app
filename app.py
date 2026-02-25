@@ -219,28 +219,31 @@ if url_text:
 
                 amount *= multiplier
 
-                if st.button("📌 レシピとして追加"):
 
-                    mapping = load_mapping()
-                    
-                
-                    for ing in ingredients:
-                        original = ing["name"]
-                        selected = selected_foods.get(original)
-                
-                        if not selected:
-                            continue
-                
-                        if original not in mapping:
-                            mapping[original] = {}
-                
-                        mapping[original][selected] = (
-                            mapping[original].get(selected, 0) + 1
-                        )
-                
-                    save_mapping(mapping)
+                st.divider()
+
+            if st.button("📌 レシピとして追加"):
+            
+                mapping = load_mapping()
+
+                selected_foods = {}
+
+                if selected:
+                    selected_foods[ing["name"]] = selected
+            
+                for original, selected in selected_foods.items():
+            
+                    if original not in mapping:
+                        mapping[original] = {}
+            
+                    mapping[original][selected] = (
+                        mapping[original].get(selected, 0) + 1
+                    )
+            
+                save_mapping(mapping)
             
                 st.success("レシピを追加しました！✨")
+
 
                 kcal_per100 = float(nutrition_dict[selected]["エネルギー"])
                 kcal = kcal_per100 * amount / 100
@@ -250,6 +253,7 @@ if url_text:
 
         st.divider()
         st.subheader(f"合計カロリー: {total_cal:.1f} kcal")
+
 
 
 
