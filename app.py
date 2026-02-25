@@ -173,7 +173,7 @@ if url_text:
                 amount = st.number_input(
                     "グラム",
                     value=float(default_g),
-                    key=f"{i}_{ing['name']}+"_amt"
+                    key=f"{i}_{ing['name']}_amt"
                 )
 
                 amount *= multiplier
@@ -186,5 +186,6 @@ if url_text:
 
         st.divider()
         st.subheader(f"合計カロリー: {total_cal:.1f} kcal")
+
 
 
