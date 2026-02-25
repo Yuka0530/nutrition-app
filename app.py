@@ -122,7 +122,7 @@ if url_text:
 
         total_cal = 0
 
-        for ing in ingredients:
+        for i, ing in enumerate(ingredients):
             st.divider()
             st.write(f"### {ing['name']}")
 
@@ -133,14 +133,14 @@ if url_text:
                 selected = st.selectbox(
                     "候補",
                     candidates,
-                    key=ing["name"]
+                    key=f"{i}_{ing['name']}"
                 )
             else:
                 st.warning("候補が見つかりません")
 
                 search_word = st.text_input(
                     "🔎 食材名を入力して検索",
-                    key=ing["name"]+"_search"
+                    key=f"{i}_{ing['name']}_search"
                 )
 
                 selected = None
@@ -155,7 +155,7 @@ if url_text:
                         selected = st.selectbox(
                             "検索結果",
                             results,
-                            key=ing["name"]+"_manual"
+                            key=f"{i}_{ing['name']}_manual"
                         )
 
                         # 保存ボタン
@@ -186,3 +186,4 @@ if url_text:
 
         st.divider()
         st.subheader(f"合計カロリー: {total_cal:.1f} kcal")
+
