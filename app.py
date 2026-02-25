@@ -81,27 +81,40 @@ def get_recipe_data(url):
 # =========================
 # 分量解析
 # =========================
-def parse_amount(text):
+import re
+
+def parse_amount(text, food_name=None, nutrition_dict=None):
     if text is None:
         return 0
 
     text = str(text)
 
-    if "g" in text:
-        return float(re.findall(r"\d+", text)[0])
+    # 🔹① (250g) のような g表記を最優先取得
+    g_match = re.search(r'(\d+(?:\.\d+)?)\s*g', text)
+    if g_match:
+        return float(g_match.group(1))
 
-    if "本" in text or "個" in text:
-        return float(re.findall(r"\d+", text)[0]) * 100
+    # 🔹② 個・本・枚など → nutrition.xlsxの「1個(g)」参照
+    unit_match = re.search(r'(\d+)', text)
+    if unit_match and food_name and nutrition_dict:
+        count = float(unit_match.group(1))
 
-    if "丁" in text:
-        return float(re.findall(r"\d+", text)[0]) * 300
+        if food_name in nutrition_dict:
+            gram_per_unit = nutrition_dict[food_name].get("1個(g)", None)
 
+            if gram_per_unit not in [None, "", "-", 0]:
+                return count * float(gram_per_unit)
+
+    # 🔹③ 大さじ・小さじ
     if "大さじ" in text:
-        return float(re.findall(r"\d+", text)[0]) * 15
+        num = re.findall(r'\d+', text)
+        return float(num[0]) * 15 if num else 15
 
     if "小さじ" in text:
-        return float(re.findall(r"\d+", text)[0]) * 5
+        num = re.findall(r'\d+', text)
+        return float(num[0]) * 5 if num else 5
 
+    # 🔹④ fallback
     return 100
 
 # =========================
@@ -168,7 +181,11 @@ if url_text:
                         st.error("見つかりません")
 
             if selected:
-                default_g = parse_amount(ing["amount"])
+                default_g = parse_amount(
+                ing["amount"],
+                food_name=selected,
+                nutrition_dict=nutrition_dict
+                )
 
                 amount = st.number_input(
                     "グラム",
@@ -186,6 +203,7 @@ if url_text:
 
         st.divider()
         st.subheader(f"合計カロリー: {total_cal:.1f} kcal")
+
 
 
 
