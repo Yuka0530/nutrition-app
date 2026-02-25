@@ -115,7 +115,26 @@ def parse_amount(text, food_name=None, nutrition_dict=None):
         return float(num[0]) * 5 if num else 5
 
     # 🔹④ fallback
-    return 100
+    return 0
+    
+# =========================
+# 候補を「選択回数順」にする関数
+# =========================    
+
+def get_sorted_candidates(original_name, candidates, mapping):
+    if original_name not in mapping:
+        return candidates
+
+    history = mapping[original_name]
+
+    # 回数順で並べ替え
+    sorted_candidates = sorted(
+        candidates,
+        key=lambda x: history.get(x, 0),
+        reverse=True
+    )
+
+    return sorted_candidates
 
 # =========================
 # UI
@@ -140,6 +159,13 @@ if url_text:
             st.write(f"### {ing['name']}")
 
             candidates = get_candidates(ing["name"])
+
+            # ⭐ 過去データで並べ替え
+            candidates = get_sorted_candidates(
+                ing["name"],
+                candidates,
+                mapping
+            )
 
             # ===== 候補がある場合 =====
             if candidates:
@@ -172,10 +198,10 @@ if url_text:
                         )
 
                         # 保存ボタン
-                        if st.button("この対応を保存", key=ing["name"]+"_save"):
-                            mapping[ing["name"]] = selected
-                            save_mapping(mapping)
-                            st.success("保存しました！次回から自動表示されます")
+                        #if st.button("この対応を保存", key=ing["name"]+"_save"):
+                            #mapping[ing["name"]] = selected
+                            #save_mapping(mapping)
+                            #st.success("保存しました！次回から自動表示されます")
 
                     else:
                         st.error("見つかりません")
@@ -195,6 +221,28 @@ if url_text:
 
                 amount *= multiplier
 
+                if st.button("📌 レシピとして追加"):
+
+                mapping = load_mapping()
+            
+                for ing in ingredients:
+                    original = ing["name"]
+                    selected = selected_foods.get(original)
+            
+                    if not selected:
+                        continue
+            
+                    if original not in mapping:
+                        mapping[original] = {}
+            
+                    mapping[original][selected] = (
+                        mapping[original].get(selected, 0) + 1
+                    )
+            
+                save_mapping(mapping)
+            
+                st.success("レシピを追加しました！✨")
+
                 kcal_per100 = float(nutrition_dict[selected]["エネルギー"])
                 kcal = kcal_per100 * amount / 100
 
@@ -203,6 +251,7 @@ if url_text:
 
         st.divider()
         st.subheader(f"合計カロリー: {total_cal:.1f} kcal")
+
 
 
 
