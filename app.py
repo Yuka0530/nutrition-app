@@ -47,14 +47,12 @@ def normalize(text):
 def get_candidates(word):
     word_n = normalize(word)
 
-    # 保存済み対応を最優先
-    if word in mapping:
-        return [mapping[word]]
-
-    return [
+    candidates = [
         food for food in nutrition_dict
         if word_n in normalize(food)
     ]
+
+    return candidates
 
 # =========================
 # URL抽出 & レシピ取得
@@ -125,16 +123,16 @@ def get_sorted_candidates(original_name, candidates, mapping):
     if original_name not in mapping:
         return candidates
 
-    history = mapping[original_name]
+    history = mapping.get(original_name, {})
 
-    # 回数順で並べ替え
-    sorted_candidates = sorted(
+    if not isinstance(history, dict):
+        return candidates
+
+    return sorted(
         candidates,
         key=lambda x: history.get(x, 0),
         reverse=True
     )
-
-    return sorted_candidates
 
 # =========================
 # UI
@@ -224,6 +222,7 @@ if url_text:
                 if st.button("📌 レシピとして追加"):
 
                     mapping = load_mapping()
+                    
                 
                     for ing in ingredients:
                         original = ing["name"]
@@ -251,6 +250,7 @@ if url_text:
 
         st.divider()
         st.subheader(f"合計カロリー: {total_cal:.1f} kcal")
+
 
 
 
