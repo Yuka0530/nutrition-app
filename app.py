@@ -231,16 +231,16 @@ if url_text:
                 if selected:
                     selected_foods[ing["name"]] = selected
             
-                for original, selected in selected_foods.items():
-            
-                    if original not in mapping:
-                        mapping[original] = {}
-            
-                    mapping[original][selected] = (
-                        mapping[original].get(selected, 0) + 1
-                    )
-            
-                save_mapping(mapping)
+                    for original, selected in selected_foods.items():
+                
+                        if original not in mapping:
+                            mapping[original] = {}
+                
+                        mapping[original][selected] = (
+                            mapping[original].get(selected, 0) + 1
+                        )
+                
+                    save_mapping(mapping)
             
                 st.success("レシピを追加しました！✨")
 
@@ -253,6 +253,7 @@ if url_text:
 
         st.divider()
         st.subheader(f"合計カロリー: {total_cal:.1f} kcal")
+
 
 
 
