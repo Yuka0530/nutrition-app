@@ -152,6 +152,8 @@ if url_text:
 
         total_cal = 0
         selected_foods = {}
+        if "selected_foods" not in st.session_state:
+            st.session_state.selected_foods = {}
 
         for i, ing in enumerate(ingredients):
             st.divider()
@@ -219,7 +221,7 @@ if url_text:
                 )
 
                 amount *= multiplier
-                selected_foods[ing["name"]] = selected
+                st.session_state.selected_foods[ing["name"]] = selected
 
                 
                 st.divider()
@@ -239,7 +241,7 @@ if url_text:
         
             mapping = load_mapping()
         
-            for original, selected in selected_foods.items():
+            for original, selected in st.session_state.selected_foods.items():
         
                 if original not in mapping:
                     mapping[original] = {}
@@ -251,6 +253,7 @@ if url_text:
             save_mapping(mapping)
         
             st.success("レシピを追加しました！✨")
+
 
 
 
