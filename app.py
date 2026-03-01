@@ -253,6 +253,8 @@ if url_text:
             save_mapping(mapping)
         
             st.success("レシピを追加しました！✨")
+            st.write("保存内容:", mapping)
+
 
 
 
