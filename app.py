@@ -151,6 +151,7 @@ if url_text:
         multiplier = st.number_input("🔢 分量倍率", value=1.0, step=0.5)
 
         total_cal = 0
+        selected_foods = {}
 
         for i, ing in enumerate(ingredients):
             st.divider()
@@ -218,8 +219,9 @@ if url_text:
                 )
 
                 amount *= multiplier
+                selected_foods[ing["name"]] = selected
 
-
+                
                 st.divider()
 
 
@@ -232,27 +234,25 @@ if url_text:
         st.divider()
         st.subheader(f"合計カロリー: {total_cal:.1f} kcal")
 
+
         if st.button("📌 レシピとして追加"):
         
             mapping = load_mapping()
-
-            selected_foods = {}
-
-            if selected:
-                selected_foods[ingredients["name"]] = selected
         
-                for original, selected in selected_foods.items():
-            
-                    if original not in mapping:
-                        mapping[original] = {}
-            
-                    mapping[original][selected] = (
-                        mapping[original].get(selected, 0) + 1
-                    )
-            
-                save_mapping(mapping)
+            for original, selected in selected_foods.items():
+        
+                if original not in mapping:
+                    mapping[original] = {}
+        
+                mapping[original][selected] = (
+                    mapping[original].get(selected, 0) + 1
+                )
+        
+            save_mapping(mapping)
         
             st.success("レシピを追加しました！✨")
+
+
 
 
 
