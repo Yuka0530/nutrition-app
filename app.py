@@ -239,7 +239,7 @@ if url_text:
             selected_foods = {}
 
             if selected:
-                selected_foods[ing["name"]] = selected
+                selected_foods[ingredients["name"]] = selected
         
                 for original, selected in selected_foods.items():
             
@@ -253,6 +253,7 @@ if url_text:
                 save_mapping(mapping)
         
             st.success("レシピを追加しました！✨")
+
 
 
 
