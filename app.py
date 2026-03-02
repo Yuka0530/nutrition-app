@@ -9,11 +9,18 @@ import gspread
 from google.oauth2.service_account import Credentials
 
 def connect_gsheet():
-    creds = Credentials.from_service_account_info(
+
+    scope = [
+        "https://www.googleapis.com/auth/spreadsheets",
+        "https://www.googleapis.com/auth/drive"
+    ]
+
+    credentials = Credentials.from_service_account_info(
         st.secrets["gcp_service_account"],
-        scopes=["https://www.googleapis.com/auth/spreadsheets"]
+        scopes=scope
     )
-    client = gspread.authorize(creds)
+
+    client = gspread.authorize(credentials)
     return client
 
 def save_to_gsheet(original, selected):
@@ -259,6 +266,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
