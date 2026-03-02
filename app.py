@@ -163,6 +163,10 @@ def get_sorted_candidates(original_name, candidates, mapping):
         return candidates
 
     history = mapping.get(original_name, {})
+    st.write("original_name:", original_name)
+    st.write("mapping:", mapping)
+    st.write("history:", mapping.get(original_name))
+
 
     if not isinstance(history, dict):
         return candidates
@@ -284,6 +288,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
