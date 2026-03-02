@@ -22,12 +22,44 @@ def connect_gsheet():
 
     client = gspread.authorize(credentials)
     return client
-
+# =========================
+# マッピング保存読み込み
+# =========================
 def save_to_gsheet(original, selected):
     client = connect_gsheet()
     sheet = client.open("food_mapping").sheet1
 
-    sheet.append_row([original, selected])
+    data = sheet.get_all_values()
+
+    # ヘッダー除外
+    rows = data[1:]
+
+    for i, row in enumerate(rows, start=2):
+        if row[0] == original and row[1] == selected:
+            count = int(row[2]) if len(row) > 2 and row[2] else 0
+            sheet.update_cell(i, 3, count + 1)
+            return
+
+    # 新規追加
+    sheet.append_row([original, selected, 1])
+
+def load_mapping():
+    client = connect_gsheet()
+    sheet = client.open("food_mapping").sheet1
+
+    data = sheet.get_all_values()[1:]
+
+    mapping = {}
+
+    for original, selected, count in data:
+        count = int(count) if count else 0
+
+        if original not in mapping:
+            mapping[original] = {}
+
+        mapping[original][selected] = count
+
+    return mapping
 
 st.set_page_config(page_title="レシピ栄養計算", layout="wide")
 
@@ -40,23 +72,6 @@ def load_nutrition():
     return df.set_index("食材").to_dict(orient="index")
 
 nutrition_dict = load_nutrition()
-
-# =========================
-# マッピング保存読み込み
-# =========================
-MAPPING_FILE = "food_mapping.json"
-
-def load_mapping():
-    if os.path.exists(MAPPING_FILE):
-        with open(MAPPING_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return {}
-
-def save_mapping(mapping):
-    with open(MAPPING_FILE, "w", encoding="utf-8") as f:
-        json.dump(mapping, f, ensure_ascii=False, indent=2)
-
-mapping = load_mapping()
 
 # =========================
 # 文字正規化
@@ -266,6 +281,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
