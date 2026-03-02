@@ -156,6 +156,7 @@ def parse_amount(text, food_name=None, nutrition_dict=None):
 # =========================
 # 候補を「選択回数順」にする関数
 # =========================    
+mapping = load_mapping()
 
 def get_sorted_candidates(original_name, candidates, mapping):
     if original_name not in mapping:
@@ -175,6 +176,7 @@ def get_sorted_candidates(original_name, candidates, mapping):
 # =========================
 # UI
 # =========================
+
 st.title("🍳 レシピ栄養計算")
 
 url_text = st.text_input("レシピURLを貼る")
@@ -200,6 +202,7 @@ if url_text:
             candidates = get_candidates(ing["name"])
 
             # ⭐ 過去データで並べ替え
+            
             candidates = get_sorted_candidates(
                 ing["name"],
                 candidates,
@@ -281,6 +284,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
