@@ -82,13 +82,19 @@ def normalize(text):
 # =========================
 # 候補検索
 # =========================
-def get_candidates(word):
+def get_candidates(word, mapping):
     word_n = normalize(word)
 
     candidates = [
         food for food in nutrition_dict
         if word_n in normalize(food)
     ]
+
+    # 🔥 mappingに履歴があるなら必ず追加
+    if word in mapping:
+        for saved_food in mapping[word].keys():
+            if saved_food not in candidates:
+                candidates.append(saved_food)
 
     return candidates
 
@@ -203,7 +209,7 @@ if url_text:
             st.divider()
             st.write(f"### {ing['name']}")
 
-            candidates = get_candidates(ing["name"])
+            candidates = get_candidates(ing["name"], mapping)
 
             # ⭐ 過去データで並べ替え
             
@@ -288,6 +294,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
