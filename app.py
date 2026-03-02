@@ -5,6 +5,22 @@ from bs4 import BeautifulSoup
 import re
 import json
 import os
+import gspread
+from google.oauth2.service_account import Credentials
+
+def connect_gsheet():
+    creds = Credentials.from_service_account_info(
+        st.secrets["gcp_service_account"],
+        scopes=["https://www.googleapis.com/auth/spreadsheets"]
+    )
+    client = gspread.authorize(creds)
+    return client
+
+def save_to_gsheet(original, selected):
+    client = connect_gsheet()
+    sheet = client.open("nutrition_mapping").sheet1
+
+    sheet.append_row([original, selected])
 
 st.set_page_config(page_title="レシピ栄養計算", layout="wide")
 
@@ -239,21 +255,11 @@ if url_text:
 
         if st.button("📌 レシピとして追加"):
         
-            mapping = load_mapping()
-        
             for original, selected in st.session_state.selected_foods.items():
+                save_to_gsheet(original, selected)
         
-                if original not in mapping:
-                    mapping[original] = {}
-        
-                mapping[original][selected] = (
-                    mapping[original].get(selected, 0) + 1
-                )
-        
-            save_mapping(mapping)
-        
-            st.success("レシピを追加しました！✨")
-            st.write("保存内容:", mapping)
+            st.success("Google Sheetsに保存しました！✨")
+
 
 
 
