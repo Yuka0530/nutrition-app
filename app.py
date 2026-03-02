@@ -18,7 +18,7 @@ def connect_gsheet():
 
 def save_to_gsheet(original, selected):
     client = connect_gsheet()
-    sheet = client.open("nutrition_mapping").sheet1
+    sheet = client.open("food_mapping").sheet1
 
     sheet.append_row([original, selected])
 
@@ -259,6 +259,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
