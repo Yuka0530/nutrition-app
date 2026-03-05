@@ -121,42 +121,91 @@ def get_recipe_data(url):
     return title, ingredients
 
 # =========================
+# 調味料 大さじ・小さじ 重量
+# =========================
+
+SPOON_WEIGHT = {
+    "しょうゆ": {"tbsp": 18, "tsp": 6},
+    "醤油": {"tbsp": 18, "tsp": 6},
+    "砂糖": {"tbsp": 9, "tsp": 3},
+    "みりん": {"tbsp": 18, "tsp": 6},
+    "酒": {"tbsp": 15, "tsp": 5},
+    "酢": {"tbsp": 15, "tsp": 5},
+    "マヨネーズ": {"tbsp": 14, "tsp": 5},
+    "ケチャップ": {"tbsp": 18, "tsp": 6},
+    "油": {"tbsp": 12, "tsp": 4},
+    "オリーブオイル": {"tbsp": 12, "tsp": 4},
+}
+
+def get_spoon_weight(food_name, spoon_type):
+
+    if food_name is None:
+        return None
+
+    for key in SPOON_WEIGHT:
+        if key in food_name:
+            return SPOON_WEIGHT[key][spoon_type]
+
+    return None
+
+
+# =========================
 # 分量解析
 # =========================
 import re
 
 def parse_amount(text, food_name=None, nutrition_dict=None):
+
     if text is None:
         return 0
 
     text = str(text)
 
-    # 🔹① (250g) のような g表記を最優先取得
+    # ① g表記
     g_match = re.search(r'(\d+(?:\.\d+)?)\s*g', text)
     if g_match:
         return float(g_match.group(1))
 
-    # 🔹② 大さじ・小さじ（← ★ここを先に）
+    # ② 大さじ
     if "大さじ" in text:
-        num = re.findall(r'\d+(?:\.\d+)?', text)
-        return float(num[0]) * 15 if num else 15
 
+        num = re.findall(r'\d+(?:\.\d+)?', text)
+        count = float(num[0]) if num else 1
+
+        gram = get_spoon_weight(food_name, "tbsp")
+
+        if gram is None:
+            gram = 15
+
+        return count * gram
+
+    # ③ 小さじ
     if "小さじ" in text:
-        num = re.findall(r'\d+(?:\.\d+)?', text)
-        return float(num[0]) * 5 if num else 5
 
-    # 🔹③ 個・本・枚など → nutrition.xlsxの「1個(g)」参照
+        num = re.findall(r'\d+(?:\.\d+)?', text)
+        count = float(num[0]) if num else 1
+
+        gram = get_spoon_weight(food_name, "tsp")
+
+        if gram is None:
+            gram = 5
+
+        return count * gram
+
+    # ④ 個数変換
     unit_match = re.search(r'(\d+(?:\.\d+)?)', text)
+
     if unit_match and food_name and nutrition_dict:
+
         count = float(unit_match.group(1))
 
         if food_name in nutrition_dict:
+
             gram_per_unit = nutrition_dict[food_name].get("1個(g)", None)
 
             if gram_per_unit not in [None, "", "-", 0]:
                 return count * float(gram_per_unit)
 
-    # 🔹④ fallback
     return 0
     
 # =========================
@@ -294,6 +343,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
