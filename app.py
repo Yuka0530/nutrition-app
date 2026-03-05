@@ -136,8 +136,17 @@ def parse_amount(text, food_name=None, nutrition_dict=None):
     if g_match:
         return float(g_match.group(1))
 
-    # 🔹② 個・本・枚など → nutrition.xlsxの「1個(g)」参照
-    unit_match = re.search(r'(\d+)', text)
+    # 🔹② 大さじ・小さじ（← ★ここを先に）
+    if "大さじ" in text:
+        num = re.findall(r'\d+(?:\.\d+)?', text)
+        return float(num[0]) * 15 if num else 15
+
+    if "小さじ" in text:
+        num = re.findall(r'\d+(?:\.\d+)?', text)
+        return float(num[0]) * 5 if num else 5
+
+    # 🔹③ 個・本・枚など → nutrition.xlsxの「1個(g)」参照
+    unit_match = re.search(r'(\d+(?:\.\d+)?)', text)
     if unit_match and food_name and nutrition_dict:
         count = float(unit_match.group(1))
 
@@ -146,15 +155,6 @@ def parse_amount(text, food_name=None, nutrition_dict=None):
 
             if gram_per_unit not in [None, "", "-", 0]:
                 return count * float(gram_per_unit)
-
-    # 🔹③ 大さじ・小さじ
-    if "大さじ" in text:
-        num = re.findall(r'\d+', text)
-        return float(num[0]) * 15 if num else 15
-
-    if "小さじ" in text:
-        num = re.findall(r'\d+', text)
-        return float(num[0]) * 5 if num else 5
 
     # 🔹④ fallback
     return 0
@@ -294,6 +294,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
