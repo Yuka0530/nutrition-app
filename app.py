@@ -308,9 +308,10 @@ if url_text:
                 food_name=selected,
                 nutrition_dict=nutrition_dict
                 )
+                st.caption(f"📖 レシピ分量：{ing['amount']}")
 
                 amount = st.number_input(
-                    "f"グラム レシピ分量{ing['amount']}",
+                    "グラム",
                     value=float(default_g),
                     key=f"{i}_{ing['name']}_amt"
                 )
@@ -338,6 +339,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
