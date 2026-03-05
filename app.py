@@ -310,7 +310,7 @@ if url_text:
                 )
 
                 amount = st.number_input(
-                    "f"グラム　📖 レシピ分量：{ing['amount']}",
+                    "f"グラム 📖 レシピ分量：{ing['amount']}",
                     value=float(default_g),
                     key=f"{i}_{ing['name']}_amt"
                 )
@@ -338,6 +338,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
