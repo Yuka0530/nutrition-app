@@ -256,7 +256,7 @@ if url_text:
 
         for i, ing in enumerate(ingredients):
             st.divider()
-            st.write(f"### {ing['name']}")
+            st.write(f"### {ing['name']}　📖 レシピ分量：{ing['amount']}")
 
             candidates = get_candidates(ing["name"], mapping)
 
@@ -338,6 +338,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
