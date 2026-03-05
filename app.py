@@ -268,44 +268,39 @@ if url_text:
                 mapping
             )
 
-            # ===== 候補がある場合 =====
+            selected = None
+
+            # ===== 候補 =====
             if candidates:
                 selected = st.selectbox(
                     "候補",
                     candidates,
-                    key=f"{i}_{ing['name']}"
+                    key=f"{i}_{ing['name']}_candidate"
                 )
             else:
                 st.warning("候補が見つかりません")
+            
+            # ===== 常に検索欄 =====
+            search_word = st.text_input(
+                "🔎 食材名を検索（候補に無い場合）",
+                key=f"{i}_{ing['name']}_search"
+            )
+            
+            if search_word:
+                results = [
+                    food for food in nutrition_dict
+                    if normalize(search_word) in normalize(food)
+                ]
+            
+                if results:
+                    selected = st.selectbox(
+                        "検索結果",
+                        results,
+                        key=f"{i}_{ing['name']}_manual"
+                    )
+                else:
+                    st.error("見つかりません")
 
-                search_word = st.text_input(
-                    "🔎 食材名を入力して検索",
-                    key=f"{i}_{ing['name']}_search"
-                )
-
-                selected = None
-
-                if search_word:
-                    results = [
-                        food for food in nutrition_dict
-                        if normalize(search_word) in normalize(food)
-                    ]
-
-                    if results:
-                        selected = st.selectbox(
-                            "検索結果",
-                            results,
-                            key=f"{i}_{ing['name']}_manual"
-                        )
-
-                        # 保存ボタン
-                        #if st.button("この対応を保存", key=ing["name"]+"_save"):
-                            #mapping[ing["name"]] = selected
-                            #save_mapping(mapping)
-                            #st.success("保存しました！次回から自動表示されます")
-
-                    else:
-                        st.error("見つかりません")
 
             if selected:
                 default_g = parse_amount(
@@ -343,6 +338,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
