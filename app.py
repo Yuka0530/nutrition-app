@@ -205,6 +205,7 @@ def parse_amount(text, food_name=None, nutrition_dict=None):
 
             if gram_per_unit not in [None, "", "-", 0]:
                 return count * float(gram_per_unit)
+            return 0
 
     return 0
     
@@ -340,6 +341,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
