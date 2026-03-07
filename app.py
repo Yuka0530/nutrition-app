@@ -43,6 +43,7 @@ def save_to_gsheet(original, selected):
     # 新規追加
     sheet.append_row([original, selected, 1])
 
+@st.cache_data
 def load_mapping():
     client = connect_gsheet()
     sheet = client.open("food_mapping").sheet1
@@ -105,6 +106,7 @@ def extract_url(text):
     match = re.search(r'https?://[^\s]+', text)
     return match.group(0) if match else None
 
+@st.cache_data
 def get_recipe_data(url):
     headers={"User-Agent":"Mozilla/5.0"}
     res=requests.get(url,headers=headers)
@@ -352,6 +354,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
