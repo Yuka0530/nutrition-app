@@ -168,30 +168,37 @@ def parse_amount(text, food_name=None, nutrition_dict=None):
 
     # ② 大さじ
     if "大さじ" in text:
-
-        num = re.findall(r'\d+(?:\.\d+)?', text)
-        st.write("num:", num)
-        count = float(num[0]) if num else 1
-
+    
+        # ⭐ 分数チェック
+        frac_match = re.search(r'(\d+)\s*/\s*(\d+)', text)
+        if frac_match:
+            count = float(frac_match.group(1)) / float(frac_match.group(2))
+        else:
+            num = re.findall(r'\d+(?:\.\d+)?', text)
+            count = float(num[0]) if num else 1
+    
         gram = get_spoon_weight(food_name, "tbsp")
-
+    
         if gram is None:
             gram = 15
-
+    
         return count * gram
 
     # ③ 小さじ
     if "小さじ" in text:
-
-        num = re.findall(r'\d+(?:\.\d+)?', text)
-        st.write("num:", num)
-        count = float(num[0]) if num else 1
-
+    
+        frac_match = re.search(r'(\d+)\s*/\s*(\d+)', text)
+        if frac_match:
+            count = float(frac_match.group(1)) / float(frac_match.group(2))
+        else:
+            num = re.findall(r'\d+(?:\.\d+)?', text)
+            count = float(num[0]) if num else 1
+    
         gram = get_spoon_weight(food_name, "tsp")
-
+    
         if gram is None:
             gram = 5
-
+    
         return count * gram
 
     # ④ 個数変換
@@ -344,6 +351,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
