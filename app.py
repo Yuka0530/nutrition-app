@@ -135,8 +135,7 @@ SPOON_WEIGHT = {
     "ケチャップ": {"tbsp": 18, "tsp": 6},
     "油": {"tbsp": 12, "tsp": 4},
     "オリーブオイル": {"tbsp": 12, "tsp": 4},
-    "＜でん粉・でん粉製品＞　（でん粉類）　じゃがいもでん粉": {"tbsp": 9, "tsp": 3},
-    "片栗粉": {"tbsp": 9, "tsp": 3},
+    "でん粉": {"tbsp": 9, "tsp": 3},
 }
 
 def get_spoon_weight(food_name, spoon_type):
@@ -353,6 +352,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
