@@ -301,9 +301,9 @@ if url_text:
                 else:
                     st.error("見つかりません")
 
-
+            st.write("selected:", selected)
             if selected:
-                st.write("selected:", selected)
+                
                 default_g = parse_amount(
                 ing["amount"],
                 food_name=selected,
@@ -341,6 +341,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
