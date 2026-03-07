@@ -303,7 +303,7 @@ if url_text:
                 else:
                     st.error("見つかりません")
 
-            st.write("selected:", selected)
+            #st.write("selected:", selected)
             if selected:
                 
                 default_g = parse_amount(
@@ -311,11 +311,7 @@ if url_text:
                 food_name=selected,
                 nutrition_dict=nutrition_dict
                 )
-                st.write("amount text:", ing["amount"])
-                st.write("selected:", selected)
-                st.write("default_g:", default_g)
                 
-
                 amount = st.number_input(
                     "グラム",
                     value=float(default_g),
@@ -346,6 +342,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
