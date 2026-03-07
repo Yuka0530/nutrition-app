@@ -170,6 +170,7 @@ def parse_amount(text, food_name=None, nutrition_dict=None):
     if "大さじ" in text:
 
         num = re.findall(r'\d+(?:\.\d+)?', text)
+        st.write("num:", num)
         count = float(num[0]) if num else 1
 
         gram = get_spoon_weight(food_name, "tbsp")
@@ -342,6 +343,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
