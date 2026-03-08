@@ -12,9 +12,22 @@ st.set_page_config(layout="wide")
 
 st.markdown("""
 <style>
+
+/* selectbox本体 */
 div[data-baseweb="select"] {
-    font-size: 12px;
+    font-size: 13px;
 }
+
+/* dropdown候補 */
+div[role="listbox"] ul {
+    font-size: 13px;
+}
+
+/* テキストを切らない */
+div[data-baseweb="select"] * {
+    white-space: nowrap !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -381,6 +394,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
