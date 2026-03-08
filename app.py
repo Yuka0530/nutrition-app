@@ -304,7 +304,7 @@ if url_text:
                 selected = st.selectbox(
                     "候補",
                     candidates,
-                    key=f"{i}_{ing['name']}_candidate"
+                    key=f"{i}_{ing['name']}_candidate",
                     label_visibility="visible"
                 )
             else:
@@ -326,7 +326,7 @@ if url_text:
                     selected = st.selectbox(
                         "検索結果",
                         results,
-                        key=f"{i}_{ing['name']}_manual"
+                        key=f"{i}_{ing['name']}_manual",
                         label_visibility="visible"
                     )
                 else:
@@ -371,6 +371,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
