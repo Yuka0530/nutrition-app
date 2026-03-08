@@ -8,6 +8,8 @@ import os
 import gspread
 from google.oauth2.service_account import Credentials
 
+st.set_page_config(layout="wide")
+
 def connect_gsheet():
 
     scope = [
@@ -265,7 +267,7 @@ def get_sorted_candidates(original_name, candidates, mapping):
 # =========================
 
 st.title("🍳 レシピ栄養計算")
-st.set_page_config(layout="wide")
+
 
 url_text = st.text_input("レシピURLを貼る")
 
@@ -371,6 +373,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
