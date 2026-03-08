@@ -19,11 +19,16 @@ div[data-baseweb="select"] {
 }
 
 /* dropdown候補 */
-div[role="listbox"] ul {
-    font-size: 13px;
+div[role="listbox"] {
+    font-size: 13px !important;
 }
 
-/* テキストを切らない */
+/* option文字 */
+div[role="option"] {
+    font-size: 13px !important;
+}
+
+/* テキスト折り返し防止 */
 div[data-baseweb="select"] * {
     white-space: nowrap !important;
 }
@@ -394,6 +399,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
