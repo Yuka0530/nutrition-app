@@ -301,7 +301,11 @@ if url_text:
         if "selected_foods" not in st.session_state:
             st.session_state.selected_foods = {}
 
+        IGNORE_INGREDIENTS = ["水", "氷", "お湯", "熱湯"]
+
         for i, ing in enumerate(ingredients):
+            if any(word in normalize(ing["name"]) for word in IGNORE_INGREDIENTS):
+                continue   
             st.divider()
             st.write(f"### {ing['name']}")
 
@@ -389,6 +393,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
