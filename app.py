@@ -22,6 +22,10 @@ div[data-baseweb="select"] div {
 div[role="listbox"] div[role="option"] div {
     font-size: 12px !important;
 
+div[role="option"] * {
+    font-size: 11px !important;
+}
+
 /* 念のため全体 */
 div[data-baseweb="select"] * {
     font-size: 12px !important;
@@ -393,6 +397,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
