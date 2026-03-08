@@ -68,10 +68,24 @@ st.set_page_config(page_title="レシピ栄養計算", layout="wide")
 # 栄養データ読み込み
 # =========================
 @st.cache_data
-def load_nutrition():
-    df = pd.read_excel("nutrition.xlsx")
-    return df.set_index("食材").to_dict(orient="index")
+#def load_nutrition():
+    #df = pd.read_excel("nutrition.xlsx")
+    #return df.set_index("食材").to_dict(orient="index")
 
+#nutrition_dict = load_nutrition()
+
+@st.cache_data
+def load_nutrition():
+
+    client = connect_gsheet()
+    sheet = client.open("nutrition").sheet1
+
+    data = sheet.get_all_values()
+
+    df = pd.DataFrame(data[1:], columns=data[0])
+
+    return df.set_index("食材").to_dict(orient="index")
+    
 nutrition_dict = load_nutrition()
 
 # =========================
@@ -354,6 +368,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
