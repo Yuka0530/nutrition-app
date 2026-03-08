@@ -10,6 +10,16 @@ from google.oauth2.service_account import Credentials
 
 st.set_page_config(layout="wide")
 
+st.markdown("""
+<style>
+div[data-baseweb="select"] span {
+    white-space: nowrap;
+    overflow-x: auto;
+    font-size: 14px;
+}
+</style>
+""", unsafe_allow_html=True)
+
 def connect_gsheet():
 
     scope = [
@@ -373,6 +383,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
