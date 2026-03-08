@@ -13,28 +13,13 @@ st.set_page_config(layout="wide")
 st.markdown("""
 <style>
 
-/* selectbox表示部分 */
-div[data-baseweb="select"] div {
-    font-size: 12px !important;
-}
-
 /* dropdown候補の文字 */
-/* dropdown候補 */
-div[role="listbox"] * {
+body div[role="listbox"] * {
     font-size: 11px !important;
 }
 
-div[role="listbox"] div[role="option"] div {
-    font-size: 11px !important;
-}
-
-/* option内部の文字 */
-div[role="option"] * {
-    font-size: 11px !important;
-}
-
-/* 念のため全体 */
-div[data-baseweb="select"] * {
+/* selectbox表示部分 */
+body div[data-baseweb="select"] * {
     font-size: 12px !important;
 }
 
@@ -404,6 +389,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
