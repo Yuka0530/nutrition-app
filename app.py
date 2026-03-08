@@ -265,6 +265,7 @@ def get_sorted_candidates(original_name, candidates, mapping):
 # =========================
 
 st.title("🍳 レシピ栄養計算")
+st.set_page_config(layout="wide")
 
 url_text = st.text_input("レシピURLを貼る")
 
@@ -304,6 +305,7 @@ if url_text:
                     "候補",
                     candidates,
                     key=f"{i}_{ing['name']}_candidate"
+                    label_visibility="visible"
                 )
             else:
                 st.warning("候補が見つかりません")
@@ -325,6 +327,7 @@ if url_text:
                         "検索結果",
                         results,
                         key=f"{i}_{ing['name']}_manual"
+                        label_visibility="visible"
                     )
                 else:
                     st.error("見つかりません")
@@ -368,6 +371,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
