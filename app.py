@@ -19,6 +19,11 @@ div[data-baseweb="select"] div {
 }
 
 /* dropdown候補の文字 */
+/* dropdown候補 */
+div[role="listbox"] * {
+    font-size: 11px !important;
+}
+
 div[role="listbox"] div[role="option"] div {
     font-size: 11px !important;
 }
@@ -399,6 +404,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
