@@ -253,7 +253,39 @@ def parse_amount(text, food_name=None, nutrition_dict=None):
             return count * float(gram_per_unit)
 
     return 0.0
-    
+
+# =========================
+# 水や少々を除外する関数
+# ========================= 
+IGNORE_INGREDIENTS = [
+    "水",
+    "お湯",
+    "熱湯",
+    "氷",
+    "湯",
+]
+
+IGNORE_WORDS = [
+    "適量",
+    "少々",
+    "適宜",
+]
+
+def is_ignored_ingredient(name):
+    name_n = normalize(name)
+
+    return any(word in name_n for word in IGNORE_INGREDIENTS)
+
+def is_ignored_amount(amount):
+
+    if amount is None:
+        return False
+
+    amount = str(amount)
+
+    return any(word in amount for word in IGNORE_WORDS)
+
+
 # =========================
 # 候補を「選択回数順」にする関数
 # =========================    
@@ -304,8 +336,13 @@ if url_text:
         IGNORE_INGREDIENTS = ["水", "氷", "お湯", "熱湯"]
 
         for i, ing in enumerate(ingredients):
-            if any(word in normalize(ing["name"]) for word in IGNORE_INGREDIENTS):
-                continue   
+            # ⭐ 食材名で除外
+            if is_ignored_ingredient(ing["name"]):
+                continue
+        
+            # ⭐ 分量で除外
+            if is_ignored_amount(ing["amount"]):
+                continue
             st.divider()
             st.write(f"### {ing['name']}")
 
@@ -393,6 +430,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
