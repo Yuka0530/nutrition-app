@@ -428,7 +428,7 @@ if url_text:
                 
                 amount = st.number_input(
                     "グラム",
-                    value=float(default_g),
+                    value=float(default_g * multiplier),
                     key=f"{i}_{ing['name']}_amt"
                 )
 
@@ -459,6 +459,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
