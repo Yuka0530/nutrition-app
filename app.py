@@ -146,13 +146,24 @@ def get_recipe_data(url):
 
     title=soup.title.get_text().split("|")[0].strip()
 
-    ingredients=[]
-    for item in soup.select(".ingredient"):
-        name=item.select_one(".ingredient-name").get_text(strip=True)
-        amount=item.select_one(".ingredient-serving").get_text(strip=True)
-        ingredients.append({"name":name,"amount":amount})
+    # ⭐ 人数取得
+    servings = 1
+    
+    block = soup.select_one(".delish-recipe-ingredients")
+    
+    if block:
+        text = block.select_one("h2").get_text(strip=True)
+        m = re.search(r"\d+", text)
+        if m:
+            servings = int(m.group())
+    
+        ingredients=[]
+        for item in soup.select(".ingredient"):
+            name=item.select_one(".ingredient-name").get_text(strip=True)
+            amount=item.select_one(".ingredient-serving").get_text(strip=True)
+            ingredients.append({"name":name,"amount":amount})
 
-    return title, ingredients
+    return title, ingredients, servings
 
 # =========================
 # 調味料 大さじ・小さじ 重量
@@ -323,8 +334,9 @@ if url_text:
     url = extract_url(url_text)
 
     if url:
-        title, ingredients = get_recipe_data(url)
+        title, ingredients, servings = get_recipe_data(url)
         st.subheader(title)
+        st.caption(f"👥 {servings} 人分")
 
         multiplier = st.number_input("🔢 分量倍率", value=1.0, step=0.5)
 
@@ -422,6 +434,9 @@ if url_text:
 
         st.divider()
         st.subheader(f"合計カロリー: {total_cal:.1f} kcal")
+        per_person = total_cal / servings
+
+        st.subheader(f"🍽 1人分カロリー: {per_person:.1f} kcal")
 
 
         if st.button("📌 レシピとして追加"):
@@ -430,6 +445,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
