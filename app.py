@@ -428,12 +428,26 @@ if url_text:
 
                 display_g = default_g * multiplier
                 
-                amount = st.number_input(
-                    "グラム",
-                    value=int(display_g),
-                    step=1,
-                    key=f"{i}_{ing['name']}_amt_{multiplier}"
-                )
+                # ===== 材料ごと倍率 =====
+                colA, colB = st.columns([3,1])
+                
+                with colB:
+                    item_multiplier = st.selectbox(
+                        "倍率",
+                        [0.25,0.5,0.75,1,1.25,1.5,2,3],
+                        index=3,
+                        key=f"{i}_{ing['name']}_multi"
+                    )
+                
+                display_g = default_g * multiplier * item_multiplier
+                
+                with colA:
+                    amount = st.number_input(
+                        "グラム",
+                        value=int(display_g),
+                        step=1,
+                        key=f"{i}_{ing['name']}_amt_{multiplier}_{item_multiplier}"
+                    )
 
                 
                 st.session_state.selected_foods[ing["name"]] = selected
@@ -462,6 +476,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
