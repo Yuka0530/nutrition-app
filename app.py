@@ -336,7 +336,13 @@ if url_text:
     if url:
         title, ingredients, servings = get_recipe_data(url)
         st.subheader(title)
-        st.caption(f"👥 {servings} 人分")
+        st.caption(f"📖 レシピは {servings} 人分")
+        
+        servings_selected = st.selectbox(
+            "🍽 何人分作る？",
+            [1,2,3,4,5,6,8,10],
+            index=[1,2,3,4,5,6,8,10].index(servings) if servings in [1,2,3,4,5,6,8,10] else 1
+        )
 
         multiplier = st.number_input("🔢 分量倍率", value=1.0, step=0.5)
 
@@ -434,7 +440,7 @@ if url_text:
 
         st.divider()
         st.subheader(f"合計カロリー: {total_cal:.1f} kcal")
-        per_person = total_cal / servings
+        per_person = total_cal / servings_selected
 
         st.subheader(f"🍽 1人分カロリー: {per_person:.1f} kcal")
 
@@ -445,6 +451,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
