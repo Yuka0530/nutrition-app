@@ -86,13 +86,6 @@ st.set_page_config(page_title="レシピ栄養計算", layout="wide")
 # 栄養データ読み込み
 # =========================
 @st.cache_data
-#def load_nutrition():
-    #df = pd.read_excel("nutrition.xlsx")
-    #return df.set_index("食材").to_dict(orient="index")
-
-#nutrition_dict = load_nutrition()
-
-@st.cache_data
 def load_nutrition():
 
     client = connect_gsheet()
@@ -118,6 +111,7 @@ def normalize(text):
 def get_candidates(word, mapping):
     word_n = normalize(word)
 
+    #まずnutrition_dictを検索
     candidates = [
         food for food in nutrition_dict
         if word_n in normalize(food)
@@ -476,6 +470,7 @@ if url_text:
                 save_to_gsheet(original, selected)
         
             st.success("Google Sheetsに保存しました！✨")
+
 
 
 
